@@ -24,6 +24,8 @@ import PricingWidget from "./components/PricingWidget";
 import EmbajadaMap from "./components/EmbajadaMap";
 import SofiaChatbot from "./components/SofiaChatbot";
 
+const logoImg = "/src/assets/images/conexion_laboral_logo_1781238959151.jpg";
+
 export default function App() {
   const [activeFAQ, setActiveFAQ] = useState<number | null>(null);
 
@@ -103,9 +105,12 @@ export default function App() {
           
           {/* Logo Identity */}
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-teal-700 flex items-center justify-center text-white shadow-md shadow-teal-700/20">
-              <span className="font-display font-black text-xl tracking-tighter">CL</span>
-            </div>
+            <img
+              src={logoImg}
+              alt="Conexión Laboral Logo"
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover shadow-sm border border-gray-150 bg-white"
+              referrerPolicy="no-referrer"
+            />
             <div>
               <span className="font-display font-extrabold text-base sm:text-lg tracking-tight text-gray-900 block leading-none">
                 Conexión Laboral
@@ -608,9 +613,12 @@ export default function App() {
           
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-teal-600 flex items-center justify-center text-white font-bold text-sm">
-                CL
-              </div>
+              <img
+                src={logoImg}
+                alt="Conexión Laboral Logo"
+                className="w-8 h-8 rounded-full object-cover border border-slate-700 bg-white"
+                referrerPolicy="no-referrer"
+              />
               <strong className="text-white text-base">Conexión Laboral</strong>
             </div>
             <p className="text-slate-400 text-xs leading-normal max-w-xs">
