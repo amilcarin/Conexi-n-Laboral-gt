@@ -146,64 +146,99 @@ export default function SofiaChatbot() {
 
     // Try to extract name if they introduce themselves (e.g. "me llamo Carlos" or "mi nombre es Maria")
     const nameMatch = textToSend.match(/(?:me llamo|mi nombre es|soy)\s+([A-Za-zÁ-ÿ]+)/i);
+    let extractedName = userName;
     if (nameMatch && nameMatch[1]) {
-      const detectedName = nameMatch[1].trim();
-      setUserName(detectedName);
-      localStorage.setItem("cl_user_name", detectedName);
+      extractedName = nameMatch[1].trim();
+      setUserName(extractedName);
+      localStorage.setItem("cl_user_name", extractedName);
     }
 
-    try {
-      // Build sliding context history to pass to backend (last 10 messages)
-      const currentHistory = messages.slice(-10).map((m) => ({
-        sender: m.sender,
-        text: m.text,
-      }));
+    // Heuristics for answers simulation
+    const lowercase = textToSend.toLowerCase();
+    
+    // Default language detection
+    let isEnglish = detectedLang === "en";
+    if (lowercase.includes("hello") || lowercase.includes("price") || lowercase.includes("where") || lowercase.includes("location") || lowercase.includes("requirement")) {
+      isEnglish = true;
+      setDetectedLang("en");
+      localStorage.setItem("sofia_detected_lang", "en");
+    } else if (lowercase.includes("hola") || lowercase.includes("precio") || lowercase.includes("donde") || lowercase.includes("requisito") || lowercase.includes("medio")) {
+      isEnglish = false;
+      setDetectedLang("es");
+      localStorage.setItem("sofia_detected_lang", "es");
+    }
 
-      const res = await fetch("/api/assistant", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: textToSend,
-          history: currentHistory,
-        }),
-      });
+    // Simulate response delay
+    setTimeout(() => {
+      let reply = "";
+      let newSuggestions: string[] = [];
+      let intent = "";
 
-      if (!res.ok) throw new Error("Server error");
-      const data: AssistantResponse = await res.json();
+      if (isEnglish) {
+        if (lowercase.includes("price") || lowercase.includes("cost") || lowercase.includes("fee") || lowercase.includes("how much")) {
+          intent = "pricing";
+          reply = `The complete personalized consulting program for US/Canada Visa is Q.1,850.00.\n\nThis includes: professional file review, complete DS-160/official Form preparation, official visa interview booking, and a 1-on-1 interview mock simulation right across the US Embassy strictly tailored to your profile.\n\nWould you like to register for a free eligibility evaluation first?`;
+          newSuggestions = ["Book Free Evaluation", "Where are you located?", "Requirements"];
+        } else if (lowercase.includes("where") || lowercase.includes("location") || lowercase.includes("office") || lowercase.includes("address")) {
+          intent = "location";
+          reply = `Our offices are located at Boulevard Austriaco, Zone 16, Guatemala City—directly in front of the US Embassy! 📍🇬🇹\n\nBeing physically opposite to the Embassy ensures you get comfortable and familiar with the area. Would you like to schedule an in-person meeting?`;
+          newSuggestions = ["Schedule in-person", "View office hours", "Main requirements"];
+        } else if (lowercase.includes("requirement") || lowercase.includes("need") || lowercase.includes("paper")) {
+          intent = "requirements";
+          reply = `The core requirements to initiate your tourist/business visa application are:\n1. Formally valid Passport (minimum 6 months validity).\n2. Proof of stable current employment or registered business income.\n3. Solid family and economic ties in Guatemala.\n\nDon't worry about complex paperwork, our advisors review and list everything step-by-step! Which visa type interest you most?`;
+          newSuggestions = ["Tourist Visa", "Work Visa", "Settle appointments"];
+        } else {
+          reply = `Hello${extractedName ? ` ${extractedName}` : ""}! I am Sofia, your expert Visa advisor here at Conexión Laboral.\n\nWe provide complete, worry-free assistance for USA & Canada Visa procedures. How can I help you today?`;
+          newSuggestions = ["How much does it cost?", "Where are you located?", "Key Visa Requirements"];
+        }
+      } else {
+        // Spanish responses (Default)
+        if (lowercase.includes("precio") || lowercase.includes("cost") || lowercase.includes("cuanto cuesta") || lowercase.includes("cuánto cuesta") || lowercase.includes("valor") || lowercase.includes("pagar")) {
+          intent = "pricing";
+          reply = `La asesoría personalizada integral para tu trámite de Visa tiene un valor de Q.1,850.00.\n\nIncluye de principio a fin:\n- Elaboración de tu expediente.\n- Llenado profesional del formulario oficial (DS-160).\n- Programación de la cita oficial en el consulado.\n- El simulacro presencial o virtual 1 a 1 para prepararte de forma realista frente a las preguntas clave del cónsul.\n\n¿Te gustaría que agendemos tu pre-evaluación gratuita de perfil hoy mismo?`;
+          newSuggestions = ["Quiero mi pre-evaluación gratis", "¿Dónde están ubicados?", "Requisitos principales"];
+        } else if (lowercase.includes("donde") || lowercase.includes("dónde") || lowercase.includes("ubicacion") || lowercase.includes("ubicación") || lowercase.includes("oficina") || lowercase.includes("direccion") || lowercase.includes("dirección")) {
+          intent = "location";
+          reply = `¡Nos encontramos en una ubicación estratégica! Nuestras oficinas están en el Boulevard Austriaco, zona 16, justo frente a la Embajada de los Estados Unidos en Ciudad de Guatemala. 📍🇬🇹\n\nHacia allí se dirigirá el día de su cita, por lo que venir a nuestra oficina le ayuda a perder los nervios y conocer de antemano el área consular. Contamos con parqueo seguro.\n\n¿Le gustaría agendar una cita presencial o prefiere realizar su evaluación inicial en línea?`;
+          newSuggestions = ["Agendar evaluación en línea", "Ir en persona a zona 16", "¿Qué horarios atienden?"];
+        } else if (lowercase.includes("requisito") || lowercase.includes("necesit") || lowercase.includes("papel") || lowercase.includes("documento")) {
+          intent = "requirements";
+          reply = `Para aplicar a la Visa de Turismo o Negocios (B1/B2), es indispensable contar con:\n1. Pasaporte vigente (por lo menos 6 meses de vigencia).\n2. Estabilidad o ingresos demostrables en Guatemala (trabajo formal, negocio propio, o remesas estables).\n3. Arraigos familiares y económicos bien fundamentados.\n\nNosotros nos encargamos de que toda esa documentación se presente de forma ordenada, clara e impecable. ¿Deseas aplicar para una Visa de Turismo o una Visa de Trabajo?`;
+          newSuggestions = ["Visa de Turismo", "Visa de Trabajo", "Evaluar perfil ahora"];
+        } else if (lowercase.includes("evaluaci") || lowercase.includes("evaluación") || lowercase.includes("gratis") || lowercase.includes("gratuita") || lowercase.includes("agenda") || lowercase.includes("cita")) {
+          intent = "evaluation";
+          reply = `¡Perfecto${extractedName ? ` ${extractedName}` : ""}! Coordinar tu cita o evaluación gratuita de perfil es sumamente fácil. Podemos programarla hoy para que platiques directamente con un asesor especialista vía WhatsApp.\n\nSolo haz clic en el botón de abajo "Chatear por WhatsApp directo" o indícame por aquí qué día de la semana te queda mejor.`;
+          newSuggestions = ["Asesoria vía WhatsApp", "Ver precios del trámite", "¿Qué documentos llevo?"];
+        } else if (lowercase.includes("turismo") || lowercase.includes("viajar") || lowercase.includes("pasear")) {
+          intent = "tourist";
+          reply = `¡La Visa de Turismo (B1/B2) es nuestro servicio más cotizado! Nos aseguramos de que su entrevista refleje con total honestidad y claridad su deseo genuino de ir a vacacionar, de compras o visitar familiares, fortaleciendo sus lazos en Guatemala.\n\n¿Quiere conocer el precio o agendar la cita gratuita de evaluación de su perfil?`;
+          newSuggestions = ["Precios del servicio", "Frente a la Embajada (Zona 16)", "Agendar cita"];
+        } else if (lowercase.includes("trabajo") || lowercase.includes("empleo")) {
+          intent = "work";
+          reply = `Con gusto. En Conexión Laboral orientamos a profesionales y técnicos guatemaltecos que buscan tramitar Visas de Trabajo o programas legales en el extranjero con patrocinadores autorizados.\n\nEste proceso requiere verificar detalladamente sus contratos o perfiles laborales. ¿Desea que evaluemos la viabilidad de su caso con un especialista por WhatsApp?`;
+          newSuggestions = ["Evaluar viabilidad laboral de gratis", "Ver dirección de oficina", "Precios del trámite"];
+        } else {
+          reply = `¡Hola${extractedName ? ` ${extractedName}` : ""}! Soy Sofía de Conexión Laboral.\n\nEstoy aquí para asistirte con total calidez sobre los requisitos, la ubicación de nuestra oficina de Zona 16 y el valor de nuestra asesoría personalizada (que es de Q.1,850.00 con simulación de entrevista incluida).\n\n¿De qué tema te gustaría que conversemos hoy para facilitar tu viaje?`;
+          newSuggestions = ["¿Cuánto cuesta la asesoría?", "¿Dónde están ubicados?", "Requisitos principales", "Agendar evaluación gratis"];
+        }
+      }
 
       const sofiaMsg: ChatMessage = {
         id: `m-${Date.now() + 1}`,
         sender: "sofia",
-        text: data.reply,
+        text: reply,
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       };
 
       setMessages((prev) => [...prev, sofiaMsg]);
-      setSuggestions(data.suggestions);
+      setSuggestions(newSuggestions);
       
-      if (data.userIntent) {
-        setLastIntent(data.userIntent);
-        localStorage.setItem("sofia_last_intent", data.userIntent);
+      if (intent) {
+        setLastIntent(intent);
+        localStorage.setItem("sofia_last_intent", intent);
       }
-      if (data.detectedLanguage) {
-        setDetectedLang(data.detectedLanguage);
-        localStorage.setItem("sofia_detected_lang", data.detectedLanguage);
-      }
-
-    } catch (error) {
-      console.error(error);
-      // Nice error response without breaking the experience
-      const errorMsg: ChatMessage = {
-        id: `m-${Date.now() + 1}`,
-        sender: "sofia",
-        text: "Mire, le explico: mi conexión interna a los servidores consulares está un poco demorada técnica, pero no se preocupe por su sueño de viajar legal. ¿Por qué no conversamos directamente con un asesor por WhatsApp para contestarle de forma inmediata? Nos puede escribir a nuestro chat directo e iniciar hoy mismo.",
-        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      };
-      setMessages((prev) => [...prev, errorMsg]);
-      setSuggestions(["Escribir por WhatsApp directo", "Ver precios del trámite"]);
-    } finally {
       setIsLoading(false);
-    }
+    }, 1000);
   };
 
   const handleSuggestionClick = (suggestion: string) => {
