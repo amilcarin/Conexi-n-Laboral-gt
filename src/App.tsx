@@ -24,7 +24,7 @@ import PricingWidget from "./components/PricingWidget";
 import EmbajadaMap from "./components/EmbajadaMap";
 import SofiaChatbot from "./components/SofiaChatbot";
 
-const logoImg = "/src/assets/images/conexion_laboral_logo_1781238959151.jpg";
+const logoImg = "https://raw.githubusercontent.com/amilcarin/Visaslaborales/main/imagenes/logo.png";
 
 export default function App() {
   const [activeFAQ, setActiveFAQ] = useState<number | null>(null);
