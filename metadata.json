@@ -1,0 +1,6 @@
+{
+  "name": "Conexión Laboral",
+  "description": "Agencia de asesoría experta en visas para USA y Canadá. Obtén tu cita gratuita y asesoría personalizada.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
