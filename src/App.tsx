@@ -206,9 +206,12 @@ export default function App() {
               
               {/* Testimonial Header block */}
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-xl">
-                  👨‍🌾
-                </div>
+                <img
+                  src="/carlos_avatar.jpg"
+                  alt="Don Carlos Alvarado"
+                  className="w-10 h-10 rounded-full object-cover border border-slate-700 bg-slate-800"
+                  referrerPolicy="no-referrer"
+                />
                 <div>
                   <h4 className="text-xs font-extrabold uppercase text-teal-400 tracking-wider">
                     Caso de Éxito Real

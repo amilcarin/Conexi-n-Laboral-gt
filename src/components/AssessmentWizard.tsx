@@ -26,6 +26,10 @@ export default function AssessmentWizard() {
     hasPreviousRefusal: "",
     hasStableJobOrBusiness: "",
     hasAssetsOrFamilyTies: "",
+    address: "",
+    experience: "",
+    jobType: "",
+    educationLevel: "",
   });
 
   const [isCalculated, setIsCalculated] = useState(false);
@@ -39,20 +43,20 @@ export default function AssessmentWizard() {
   };
 
   const nextStep = () => {
-    if (step === 1 && (!form.fullName.trim() || !form.phoneNumber.trim())) {
-      alert("Por favor, ingrese su nombre y teléfono para continuar con su diagnóstico personalizado.");
+    if (step === 1 && (!form.fullName.trim() || !form.phoneNumber.trim() || !form.address?.trim())) {
+      alert("Por favor, ingrese su nombre, teléfono y dirección para continuar.");
       return;
     }
     if (step === 2 && !form.targetCountry) {
       alert("Por favor, elija el país de destino.");
       return;
     }
-    if (step === 3 && !form.visaType) {
-      alert("Por favor, elija el tipo de visa de su interés.");
+    if (step === 3 && (!form.visaType || !form.educationLevel || !form.jobType?.trim() || !form.experience)) {
+      alert("Por favor, complete todos los campos del perfil laboral: tipo de visa, nivel de estudios, tipo de trabajo y experiencia.");
       return;
     }
     if (step === 4 && (!form.hasStableJobOrBusiness || !form.hasAssetsOrFamilyTies || !form.hasPreviousRefusal)) {
-      alert("Por favor, responda todas las preguntas para calcular su perfil.");
+      alert("Por favor, responda todas las preguntas de estabilidad para calcular su perfil.");
       return;
     }
 
@@ -79,6 +83,10 @@ export default function AssessmentWizard() {
       hasPreviousRefusal: "",
       hasStableJobOrBusiness: "",
       hasAssetsOrFamilyTies: "",
+      address: "",
+      experience: "",
+      jobType: "",
+      educationLevel: "",
     });
     setIsCalculated(false);
   };
@@ -141,6 +149,10 @@ export default function AssessmentWizard() {
       `¡Hola *Conexión Laboral*! He realizado mi autoevaluación de visa en la web:`,
       `👤 *Nombre:* ${form.fullName}`,
       `📞 *Teléfono:* ${form.phoneNumber}`,
+      `📍 *Dirección:* ${form.address || "No especificada"}`,
+      `🎓 *Estudios:* ${form.educationLevel || "No especificado"}`,
+      `💼 *Tipo de Trabajo / Oficio:* ${form.jobType || "No especificado"}`,
+      `⏳ *Experiencia Laboral:* ${form.experience || "No especificada"}`,
       `🌎 *Destino de Interés:* Visa para ${form.targetCountry}`,
       `📁 *Tipo de Visa:* ${form.visaType}`,
       `👔 *¿Empleo/Negocio?:* ${form.hasStableJobOrBusiness}`,
@@ -246,6 +258,18 @@ export default function AssessmentWizard() {
                           className="w-full text-sm border border-gray-200 focus:border-teal-500 rounded-lg p-2.5 outline-none text-gray-800"
                         />
                       </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                          Dirección (Municipio y Departamento)
+                        </label>
+                        <input
+                          type="text"
+                          value={form.address || ""}
+                          onChange={(e) => handleInputChange("address", e.target.value)}
+                          placeholder="p.ej. Villa Nueva, Guatemala"
+                          className="w-full text-sm border border-gray-200 focus:border-teal-500 rounded-lg p-2.5 outline-none text-gray-800"
+                        />
+                      </div>
                     </div>
                   </motion.div>
                 )}
@@ -342,6 +366,55 @@ export default function AssessmentWizard() {
                           Ideal para agricultores, técnicos o profesionales contratados legalmente en el norte.
                         </p>
                       </button>
+                    </div>
+
+                    {/* Campos Adicionales de Perfil Laboral */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-750 mb-1 font-medium">
+                          Nivel de Estudio
+                        </label>
+                        <select
+                          value={form.educationLevel || ""}
+                          onChange={(e) => handleInputChange("educationLevel", e.target.value)}
+                          className="w-full text-xs border border-gray-200 focus:border-teal-500 rounded-lg p-2.5 outline-none text-gray-800 bg-white cursor-pointer"
+                        >
+                          <option value="">-- Seleccionar --</option>
+                          <option value="Primaria / Básicos">Primaria / Básicos</option>
+                          <option value="Diversificado / Bachiller">Diversificado / Bachiller</option>
+                          <option value="Técnico / Universidad Incompleta">Técnico / Universidad Incompleta</option>
+                          <option value="Universitario Graduado">Universitario Graduado</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-750 mb-1 font-medium">
+                          Años de Experiencia Laboral
+                        </label>
+                        <select
+                          value={form.experience || ""}
+                          onChange={(e) => handleInputChange("experience", e.target.value)}
+                          className="w-full text-xs border border-gray-200 focus:border-teal-500 rounded-lg p-2.5 outline-none text-gray-800 bg-white cursor-pointer"
+                        >
+                          <option value="">-- Seleccionar --</option>
+                          <option value="Menos de 2 años">Menos de 2 años</option>
+                          <option value="2 a 5 años">2 a 5 años</option>
+                          <option value="Más de 5 años">Más de 5 años</option>
+                        </select>
+                      </div>
+
+                      <div className="md:col-span-2">
+                        <label className="block text-xs font-semibold text-gray-750 mb-1 font-medium">
+                          Tipo de Trabajo u Oficio Actual
+                        </label>
+                        <input
+                          type="text"
+                          value={form.jobType || ""}
+                          onChange={(e) => handleInputChange("jobType", e.target.value)}
+                          placeholder="p.ej. Agricultor, Técnico Electricista, Perito Contador, Enfermera"
+                          className="w-full text-xs border border-gray-200 focus:border-teal-500 rounded-lg p-2.5 outline-none text-gray-850"
+                        />
+                      </div>
                     </div>
                   </motion.div>
                 )}

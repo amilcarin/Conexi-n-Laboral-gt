@@ -18,7 +18,7 @@ import {
   HelpCircle,
   MessageCircle
 } from "lucide-react";
-const sofiaAvatar = "/src/assets/images/sofia_avatar_1781236440185.jpg";
+const sofiaAvatar = "/sofia_avatar.jpg";
 
 export default function SofiaChatbot() {
   const [isOpen, setIsOpen] = useState(false);

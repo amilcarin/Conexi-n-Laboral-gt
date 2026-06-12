@@ -20,6 +20,10 @@ export interface AssessmentForm {
   hasPreviousRefusal: "Sí" | "No" | "";
   hasStableJobOrBusiness: "Sí" | "No" | "";
   hasAssetsOrFamilyTies: "Sí" | "No" | "";
+  address?: string;
+  experience?: string;
+  jobType?: string;
+  educationLevel?: string;
 }
 
 export interface VisaStep {
